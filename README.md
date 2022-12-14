@@ -69,6 +69,21 @@ When you run Cupla a full list of all the settings is given, either on stdout (i
 
 As input directory you can also have a Github repo. Cupla will then clone that repo into the output directory (which must be given). At least this works under Mac OS, and most likely also on other Unix-like platforms.
 
+## Some figures
+
+The following table summarizes some of the results of Cupla and CPD.
+
+| System      | Language | #Files | #Lines | #LOC | CPD% | Cupla% | Cuple time |
+|:------------|:---------|:-------|:-------|:-----|:-----|:-------|:-----------|
+|Linux        | C        | 10.672 | 6,3 M  | 4,3 M| 3%   | 7%     | 1 min 30 sec|
+|Tensorflow   | C++      | 4.575  | 1,3 M  | 1,0 M| 5%   | 13%    |  26 sec |
+|Pytorch      | C++      | 1.481  | 0,6 M  | 0,5 M| 4%   | 10%    |  11 sec |
+|Elasticsearch| Java     | 9.395  | 1,5 M  | 1,0 M| -    |  8%    |  18 sec |
+|Spark        | C++      |   791  |  94 K  | 48 K | 5%   | 12%    |   3 sec |
+|             | Scala    | 2.354  | 0,5 M  | 0,3 M| 3%   |  6%    |  50 sec |
+|PMD          | Java     | 1.769  | 175 K  | 99 K | 1%   | 13%    |   5 sec |
+|Cupla        | Java     |    22  |  4,5 K | 2,5 K| 0%   | 0%     |  0,4 sec|
+
 
 ## A brief comparison between Cupla and CPD
 The following is based on a sample from Tensorflow (see ```src/test/resources/cupla-tests-input/tensorflow-sample2-*``` in case you have access to the Cupla repository).  CPD reports 11 (pure) clones, they are all covered by Cupla that in most cases has found larger (pseudo) clones.  For this sample CPD reports 4% duplication, Cupla 9%.
