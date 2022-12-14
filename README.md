@@ -58,7 +58,7 @@ The directory ```jar``` contains a compiled version of this repo. You can run th
 ```
     java -jar cupla_java-<version>.jar <ini-file>
 ```
-The argument ```<ini-file>``` should be a configuration file that at least should include an input directory.  If no output directory is given, then the output is given on stdout.  The extension is by default 'java', and the 'minTotalTokenLen' is by default 100.  Note that the parameters are case insensitive, so 'inputDir' equals 'inputdir'. So, such an ini-file may have the following contents:
+The argument ```<ini-file>``` is a configuration file that should at least include an input directory.  If no output directory is given, then the output is given on stdout.  The extension is by default 'java', and the 'minTotalTokenLen' is by default 100.  Note that the parameters are case insensitive, so 'inputDir' equals 'inputdir'. So, such an ini-file may have the following contents:
 ```
     inputDir = your-input-directory
     extension = your-extension
