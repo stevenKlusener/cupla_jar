@@ -56,7 +56,7 @@ When the matches of each clone instance are concatenated we get a duplicated seq
 
 The directory ```jar``` contains a compiled version of this repo. You can run this as follows (if you have Java17 or higher)
 ```
-    java -jar jars/cupla_java-<version>.jar <ini-file>
+    java -jar cupla_java-<version>.jar <ini-file>
 ```
 The argument ```<ini-file>``` should be a configuration file that at least should include an input directory.  If no output directory is given, then the output is given on stdout.  The extension is by default 'java', and the 'minTotalTokenLen' is by default 100.  Note that the parameters are case insensitive, so 'inputDir' equals 'inputdir'. So, such an ini-file may have the following contents:
 ```
