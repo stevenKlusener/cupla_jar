@@ -1,0 +1,5 @@
+Copyright Ⓒ 2022 Klusener Consultancy, author Steven Klusener
+
+Cupla is designed and developed by Steven Klusener, who holds all rights on this software.
+This repository contains a jar-file of version 0.1.3 of Cupla, which can be applied for reviewing purposes only until March 1, 2023.
+For a description how to apply it, please check the README.
