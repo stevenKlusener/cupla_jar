@@ -75,7 +75,7 @@ As input directory you can also have a Github repo. Cupla will then clone that r
 
 ## Project organisation
 
-(This section if not applicable for the repository ```cupla_jar```)
+(This section is not applicable for the repository ```cupla_jar```)
 
 This application exports only the main package ```com.klusener.cupla```, it depends only on standard Java packages, see also the file ```src/main/java/module-info.java```.  The main package contains only one class file defining the ```main```-program that is triggered by the above Java-command.  The actual functionality is defined in the following subpackages, these are not exported:
 
@@ -102,7 +102,7 @@ We have also added some configuration files for Eclipse, i.e. ```.classpath```, 
 Finally, for convenience we have added the generated jar-files in the folder ```jars```.
 
 ## End-to-End testing
-(This section if not applicable for the repository ```cupla_jar```)
+(This section is not applicable for the repository ```cupla_jar```)
 
 There are also some tests that take an number of input files run Cupla and compare all the results with a reference output.
 These tests are defined in:
