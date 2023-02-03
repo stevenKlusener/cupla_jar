@@ -75,7 +75,7 @@ As input directory you can also have a Github repo. Cupla will then clone that r
 
 ## Project organisation
 
-(This section is not applicable for the repository ```cupla_jar```)
+(This section if not applicable for the repository ```cupla_jar```)
 
 This application exports only the main package ```com.klusener.cupla```, it depends only on standard Java packages, see also the file ```src/main/java/module-info.java```.  The main package contains only one class file defining the ```main```-program that is triggered by the above Java-command.  The actual functionality is defined in the following subpackages, these are not exported:
 
@@ -102,7 +102,7 @@ We have also added some configuration files for Eclipse, i.e. ```.classpath```, 
 Finally, for convenience we have added the generated jar-files in the folder ```jars```.
 
 ## End-to-End testing
-(This section is not applicable for the repository ```cupla_jar```)
+(This section if not applicable for the repository ```cupla_jar```)
 
 There are also some tests that take an number of input files run Cupla and compare all the results with a reference output.
 These tests are defined in:
@@ -238,6 +238,48 @@ If we add the following line to the ini-file, then all files that contain the st
 ```
 After running Cupla again with this extra setting, 729 Java files have been selected with Cupla reports 5821 duplicated lines of code (12%) whereas PMD/CPD reports only 71 duplicated lines of code for these files (0%).
 
+## The Settings
+
+Below we briefly describe each setting that can be set in the ini-file.
+Note that the names of the parameters are case insensitive, thus ```logLevel``` and ```loglevel``` are handled the same way.
+
+### General Parameters
+- ```runName``` (default ```cupla```), this name will be used in the output files, like ```cupla.log```, ```cupla-report.txt``` and ```cupla-summary.txt```.
+- ```outputDir```, (default empty), if set then the given directory is used as output directory. The directory is created if it did not exist before. If it is not set, then the output is dumped to stdout.
+- ```parallelize``` (default ```true```), if set, then the tokenization and the clone construction is spread over multiple parallel threads.
+- ```loglevel``` (default ```warning```), other allowed values are ```severe```, ```info``` and ```debug```. The last value is mapped onto the the Java level ```FINE```.
+- ```dumpDetails``` (default ```false```), if set, then some details are dumped. For ex. the output directory will have a subdirectory ```tokens``` that contains the tokens of each input file.
+- ```runPmd```, (by default not set), if this parameter is definied it should contain the (full path to) the PMD-executable. If so, then PMD will be applied on the selected files (i.e., the files collected in the output file ```cupla-filelist.txt```). If Cupla is rerun the PMD-statistics will be included in ```cupla-summary.txt```.
+- ```cpdReportFile```, (by default not set), if this parameter is defined it should contain the full path to a PMD/CPD-output file. If set, then the PMD-statistics will be included in ```cupla-summary.txt```. Note that either ```runPmd``` or ```cpdReportFile``` should be defined, but not both.
+- ```defensive``` (default ```false```), if set, then a final sanity check is done on the constructed clones.
+
+### File Selector Parameters
+- ```inputDir```, (no default), this is the only mandatory parameter, it defines the input directory from where the input files are selected.
+- ```extension```, (default ```java```), only files with the given extension are selected. Note that the extension also defines the 'language'-flavor of the tokenization. In case ```cpp``` or ```c```, then the CPP-tokenizer is used.
+- ```skipFilePattern``` (default ```test```), all files or directories that match this pattern are skipped. This pattern can contain multiple subpatterns as usual, like ```test|drivers```.
+- ```selectFilePattern``` (default undefined), if defined only files are selected if they match this pattern.
+
+### Tokenization Parameters
+- ```skipStartTag``` (default undefined), if set then all tokens following this tag until the ```skipEndTag``` are skipped by the clone construction.
+- ```skipEndTag``` (default undefined), see ```skipStartTag```.
+- ```baseNormalisation``` (default ```true```), if set, then the name of the file is replaced by ```__BASE__```. Suppose you have a file ```Abc_def.java```, then an identifier like ```myAbcDef``` is stored as ```my__BASE__```, idem for strings. This normalisation is particularly relevant for C++ implementation files in which all method declarations are qualified with the class name that normally corresponds with the file name. Without this normalisation (much) less duplication is found.
+- ```caseInsensitive``` (default ```true```), if set, then all identifier and strings are stored in uppercase.
+- ```skipPreprocessing``` (default ```true```, only relevant for C and C++), if set, then all lines that start with a preprocess keyword are skipped, in particular ```#include ...```.
+- ```skipImports``` (default ```true```, not relevant for C and C++, mainly for Java), if set, then all import statements are skipped.
+- ```qualifiedmaxlevel``` (default ```-1```), if set (i.e., if greater than 0) then all curly brackets until this depth are qualified.
+So, if ```qualifiedMaxLevel=2```, then the top most opening/closing curly brackets will be stored as ```{.0``` and ```}.0```, and the next level as ```{.1``` and ```}.1```. All lower curly brackets will not be qualified. During clone construction such a qualified closing bracket, like ```}.0``` and ```}.1``` indicate the end of a clone, clone construction will not cross any of these symbols.  In case of C/C++ the namespaces will be added, so if a we have a 3-level namespace and qualifiedMaxLevel=2, then we will have ```{.0, ..., {.4```.  When C/C++ code contains preprocessing code with unmatching curly brackets, then this mechanism may lead to unwanted results, i.e., it will find less duplication as closing curly brackets are seen as the end of some top-most level.
+Note that this mechanism is still experimental and still has to be evaluated thoroughly.
+
+
+### Clone Construction Parameters
+- ```minTotalTokenLen``` (default ```100```), clones with a total length less then this parameter are skipped. Note that the gaps of a clone do not count when the number of tokens of a clone instance are counted. Note also that the length of a clone is equal to the length of any of its clone instances.
+- ```maxGapSplitCount``` (default ```1000```), if during the clone construction a split is reached with a large number of different tokens (i.e., larger than this parameter), then no gap construction is issued and for each token a subclone is created.
+- ```maxGapLength``` (default 30), the maximum length of a gap.
+- ```minmatchlength``` (default 20), the mimimum number of matching tokens that should follow a gap.
+- ```checkNoStartTokens``` (default ```true```), if set then certain tokens (like the separatot symbol ```;```) are not allowed as the start of a clone.
+- ```timeout``` (default ```3000```, in milliseconds), this timeout is used during the clone construction by each of the worker process, see the next parameter.
+- ```timeoutminclonecount``` (default ```25```), each worker process has a list of clones, takes the first clone which may be split into subclones which are then added to the list of clones. Then moves on to the next clone, etcetera, until the list is empty.  If the timeout is reached and the number of clones exceeds this threshold, then the worker process returns its list of to-do clones to the main process and stops. The main process collects all remaining clones from its worker processes and redistributes them over a new set of worker processes. Without this timeout mechanism most worker process will terminate rather fast and a few worker process (those that got the 'complex' initial clones) will take a very long time, leading to a low level of parallelism.
+
 ## Future work
 
 This is a first version, it still has to be tested on a larger scale.  Further potential improvements are given below.
@@ -251,11 +293,6 @@ The detection of clones and their gaps is steered by a number of parameters:
 Obviously, if different values are taken for these parameters then less of more duplication is detected. We have to apply Cupla on a larger scale, and discuss the results with various experts, before the *typical settings* are determined. Note that, following the minimal token length of CPD, it is common to apply a defensive policy, where false positives are avoided at the cost of false negatives.
 
 On certain occasions we may deviate from this policy, for example in case the possibilities of refactoring a package are analysed, and all forms of duplication should covered. Then one may prefer to avoid false negatives at the cost of some false positives. In that case we may lower the minimal token length and the minimal pure clone length and increase the gap length. This will increase the number of detected clones significantly, although some of them will be related to boilerplate code instead of plain duplication. So, when to use which values for the parameters has to be further analysed.
-
-### Clones that follow the structure
-We would like to see only clones that are consistent with the structure of the code. For example, we would like to avoid a clone that starts with the end of one method, followed by the start of the next method. 
-
-In the above example we see a clone that starts with ```...();```, probably it is more intuitive to drop this line entirely from the clone.
 
 ### Revisiting the tokenizers
 Currently we have one tokenizer, with some refinements for C++, that is applied to various languages.
